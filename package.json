@@ -1,0 +1,24 @@
+{
+  "name": "playground",
+  "version": "1.0.0",
+  "description": "test env",
+  "main": "index.js",
+  "dependencies": {
+    "ganache-cli": "^6.11.0",
+    "truffle": "^5.1.47"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Morgan-Griffiths/crypto.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Morgan-Griffiths/crypto/issues"
+  },
+  "homepage": "https://github.com/Morgan-Griffiths/crypto#readme"
+}
