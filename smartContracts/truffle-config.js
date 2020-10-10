@@ -39,7 +39,7 @@ module.exports = {
     development: {
         host: "127.0.0.1",
         port: 8584,
-        network_id: "∗",
+        network_id: "*",
         gas: 4712388,
         gasPrice: 100000000000,
         // websockets: true

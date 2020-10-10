@@ -1,5 +1,5 @@
-const LiquidityValueCalculator = artifact.require('LiquidityValueCalculator.sol')
+const LiquidityValueCalculator = artifacts.require('LiquidityValueCalculator.sol')
 const factory = '0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f'
 module.exports = function(deployer) {
-    deployer.deploy(LiquidityValueCalculator)
+    deployer.deploy(LiquidityValueCalculator, factory)
 }
