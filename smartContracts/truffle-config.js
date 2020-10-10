@@ -82,8 +82,8 @@ module.exports = {
     // }
   },
 
-  // Set default jest options here, use special reporters etc.
-  jest: {
+  // Set default mocha options here, use special reporters etc.
+  mocha: {
     // timeout: 100000
   },
 

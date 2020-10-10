@@ -6,6 +6,7 @@ import bitcoin as b
 import sys
 import json
 import os
+import binascii
 try:
     from urllib.request import build_opener
 except:
@@ -121,7 +122,7 @@ else:
 # Grab the extra data command line argument
 if '--extradata' in sys.argv:
     d = (sys.argv+[None])[sys.argv.index('--extradata') + 1]
-    EXTRADATA = (d[2:] if d[:2] == '0x' else d).decode('hex')
+    EXTRADATA = binascii.hexlify(bytes(d[2:] if d[:2] == '0x' else d,encoding='utf8'))#decode('hex')
 else:
     EXTRADATA = ''
 
@@ -290,4 +291,4 @@ def evaluate():
     return g
 
 if __name__ == '__main__':
-    print json.dumps(evaluate(), indent=4)
+    print(json.dumps(evaluate(), indent=4))
