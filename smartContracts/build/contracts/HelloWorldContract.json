@@ -3,12 +3,10 @@
   "abi": [
     {
       "inputs": [],
-      "payable": false,
       "stateMutability": "nonpayable",
       "type": "constructor"
     },
     {
-      "constant": true,
       "inputs": [],
       "name": "greet",
       "outputs": [
@@ -18,20 +16,21 @@
           "type": "string"
         }
       ],
-      "payable": false,
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.5.16+commit.9c3226ce\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"constant\":true,\"inputs\":[],\"name\":\"greet\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/Users/morgan/Code/crypto/smartContracts/contracts/HelloWorldContract.sol\":\"HelloWorldContract\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/Users/morgan/Code/crypto/smartContracts/contracts/HelloWorldContract.sol\":{\"keccak256\":\"0xb4791b6fe5da97aed8b850eb487b9ff6c084b386040de9b80964e084e1846a65\",\"urls\":[\"bzz-raw://d07fb0c62d788984426708df1f81a0e6cecfdc589c1c59689e4c6f56ddb9f331\",\"dweb:/ipfs/QmWVoa9xkWqMmAUxtFy1J8ACAG7ccDLXA2gTqAxS6cQ3Gn\"]}},\"version\":1}",
-  "bytecode": "0x608060405234801561001057600080fd5b506040518060400160405280600b81526020017f48656c6c6f20576f726c640000000000000000000000000000000000000000008152506000908051906020019061005c929190610062565b50610107565b828054600181600116156101000203166002900490600052602060002090601f016020900481019282601f106100a357805160ff19168380011785556100d1565b828001600101855582156100d1579182015b828111156100d05782518255916020019190600101906100b5565b5b5090506100de91906100e2565b5090565b61010491905b808211156101005760008160009055506001016100e8565b5090565b90565b61018a806101166000396000f3fe608060405234801561001057600080fd5b506004361061002b5760003560e01c8063cfae321714610030575b600080fd5b6100386100b3565b6040518080602001828103825283818151815260200191508051906020019080838360005b8381101561007857808201518184015260208101905061005d565b50505050905090810190601f1680156100a55780820380516001836020036101000a031916815260200191505b509250505060405180910390f35b606060008054600181600116156101000203166002900480601f01602080910402602001604051908101604052809291908181526020018280546001816001161561010002031660029004801561014b5780601f106101205761010080835404028352916020019161014b565b820191906000526020600020905b81548152906001019060200180831161012e57829003601f168201915b505050505090509056fea265627a7a72315820f1627f0566dfb5f3eb97def7e43f31a0cf7d81739e68b929f8f439c71735629864736f6c63430005100032",
-  "deployedBytecode": "0x608060405234801561001057600080fd5b506004361061002b5760003560e01c8063cfae321714610030575b600080fd5b6100386100b3565b6040518080602001828103825283818151815260200191508051906020019080838360005b8381101561007857808201518184015260208101905061005d565b50505050905090810190601f1680156100a55780820380516001836020036101000a031916815260200191505b509250505060405180910390f35b606060008054600181600116156101000203166002900480601f01602080910402602001604051908101604052809291908181526020018280546001816001161561010002031660029004801561014b5780601f106101205761010080835404028352916020019161014b565b820191906000526020600020905b81548152906001019060200180831161012e57829003601f168201915b505050505090509056fea265627a7a72315820f1627f0566dfb5f3eb97def7e43f31a0cf7d81739e68b929f8f439c71735629864736f6c63430005100032",
-  "sourceMap": "34:197:0:-;;;85:56;8:9:-1;5:2;;;30:1;27;20:12;5:2;85:56:0;112:24;;;;;;;;;;;;;;;;;:8;:24;;;;;;;;;;;;:::i;:::-;;34:197;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:::i;:::-;;;:::o;:::-;;;;;;;;;;;;;;;;;;;;;;;;;;;:::o;:::-;;;;;;;",
-  "deployedSourceMap": "34:197:0:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;34:197:0;;;;;;;;;;;;;;;;;;;146:83;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;23:1:-1;8:100;33:3;30:1;27:10;8:100;;;99:1;94:3;90:11;84:18;80:1;75:3;71:11;64:39;52:2;49:1;45:10;40:15;;8:100;;;12:14;146:83:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;184:13;214:8;207:15;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;146:83;:::o",
+  "metadata": "{\"compiler\":{\"version\":\"0.6.6+commit.6c089d02\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"inputs\":[],\"name\":\"greet\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/home/alex/AltCoinTrader/crypto/smartContracts/contracts/HelloWorldContract.sol\":\"HelloWorldContract\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/home/alex/AltCoinTrader/crypto/smartContracts/contracts/HelloWorldContract.sol\":{\"keccak256\":\"0xb4791b6fe5da97aed8b850eb487b9ff6c084b386040de9b80964e084e1846a65\",\"urls\":[\"bzz-raw://d07fb0c62d788984426708df1f81a0e6cecfdc589c1c59689e4c6f56ddb9f331\",\"dweb:/ipfs/QmWVoa9xkWqMmAUxtFy1J8ACAG7ccDLXA2gTqAxS6cQ3Gn\"]}},\"version\":1}",
+  "bytecode": "0x608060405234801561001057600080fd5b506040518060400160405280600b81526020017f48656c6c6f20576f726c640000000000000000000000000000000000000000008152506000908051906020019061005c929190610062565b50610107565b828054600181600116156101000203166002900490600052602060002090601f016020900481019282601f106100a357805160ff19168380011785556100d1565b828001600101855582156100d1579182015b828111156100d05782518255916020019190600101906100b5565b5b5090506100de91906100e2565b5090565b61010491905b808211156101005760008160009055506001016100e8565b5090565b90565b61018b806101166000396000f3fe608060405234801561001057600080fd5b506004361061002b5760003560e01c8063cfae321714610030575b600080fd5b6100386100b3565b6040518080602001828103825283818151815260200191508051906020019080838360005b8381101561007857808201518184015260208101905061005d565b50505050905090810190601f1680156100a55780820380516001836020036101000a031916815260200191505b509250505060405180910390f35b606060008054600181600116156101000203166002900480601f01602080910402602001604051908101604052809291908181526020018280546001816001161561010002031660029004801561014b5780601f106101205761010080835404028352916020019161014b565b820191906000526020600020905b81548152906001019060200180831161012e57829003601f168201915b505050505090509056fea2646970667358221220ae82848535077227c0de90a6927220d4c361c7efe4dc35551a3b0dd7f4dbd4f464736f6c63430006060033",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b506004361061002b5760003560e01c8063cfae321714610030575b600080fd5b6100386100b3565b6040518080602001828103825283818151815260200191508051906020019080838360005b8381101561007857808201518184015260208101905061005d565b50505050905090810190601f1680156100a55780820380516001836020036101000a031916815260200191505b509250505060405180910390f35b606060008054600181600116156101000203166002900480601f01602080910402602001604051908101604052809291908181526020018280546001816001161561010002031660029004801561014b5780601f106101205761010080835404028352916020019161014b565b820191906000526020600020905b81548152906001019060200180831161012e57829003601f168201915b505050505090509056fea2646970667358221220ae82848535077227c0de90a6927220d4c361c7efe4dc35551a3b0dd7f4dbd4f464736f6c63430006060033",
+  "immutableReferences": {},
+  "sourceMap": "34:197:0:-:0;;;85:56;5:9:-1;2:2;;;27:1;24;17:12;2:2;85:56:0;112:24;;;;;;;;;;;;;;;;;:8;:24;;;;;;;;;;;;:::i;:::-;;34:197;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:::i;:::-;;;:::o;:::-;;;;;;;;;;;;;;;;;;;;;;;;;;;:::o;:::-;;;;;;;",
+  "deployedSourceMap": "34:197:0:-:0;;;;5:9:-1;2:2;;;27:1;24;17:12;2:2;34:197:0;;;;;;;;;;;;;;;;12:1:-1;9;2:12;146:83:0;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;23:1:-1;8:100;33:3;30:1;27:10;8:100;;;99:1;94:3;90:11;84:18;80:1;75:3;71:11;64:39;52:2;49:1;45:10;40:15;;8:100;;;12:14;146:83:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;184:13;214:8;207:15;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;146:83;:::o",
   "source": "pragma solidity >=0.4.22 <0.8.0;\n\ncontract HelloWorldContract {\n  string greeting;\n  constructor() public {\n    greeting = 'Hello World';\n  }\n    function greet() public view returns (string memory) {\n      return greeting;\n    }\n}",
-  "sourcePath": "/Users/morgan/Code/crypto/smartContracts/contracts/HelloWorldContract.sol",
+  "sourcePath": "/home/alex/AltCoinTrader/crypto/smartContracts/contracts/HelloWorldContract.sol",
   "ast": {
-    "absolutePath": "/Users/morgan/Code/crypto/smartContracts/contracts/HelloWorldContract.sol",
+    "absolutePath": "/home/alex/AltCoinTrader/crypto/smartContracts/contracts/HelloWorldContract.sol",
     "exportedSymbols": {
       "HelloWorldContract": [
         20
@@ -55,6 +54,7 @@
         "src": "0:32:0"
       },
       {
+        "abstract": false,
         "baseContracts": [],
         "contractDependencies": [],
         "contractKind": "contract",
@@ -70,8 +70,10 @@
           {
             "constant": false,
             "id": 3,
+            "mutability": "mutable",
             "name": "greeting",
             "nodeType": "VariableDeclaration",
+            "overrides": null,
             "scope": 20,
             "src": "66:15:0",
             "stateVariable": true,
@@ -159,6 +161,7 @@
             "modifiers": [],
             "name": "",
             "nodeType": "FunctionDefinition",
+            "overrides": null,
             "parameters": {
               "id": 4,
               "nodeType": "ParameterList",
@@ -174,7 +177,7 @@
             "scope": 20,
             "src": "85:56:0",
             "stateMutability": "nonpayable",
-            "superFunction": null,
+            "virtual": false,
             "visibility": "public"
           },
           {
@@ -205,12 +208,14 @@
               ]
             },
             "documentation": null,
+            "functionSelector": "cfae3217",
             "id": 19,
             "implemented": true,
             "kind": "function",
             "modifiers": [],
             "name": "greet",
             "nodeType": "FunctionDefinition",
+            "overrides": null,
             "parameters": {
               "id": 12,
               "nodeType": "ParameterList",
@@ -224,8 +229,10 @@
                 {
                   "constant": false,
                   "id": 14,
+                  "mutability": "mutable",
                   "name": "",
                   "nodeType": "VariableDeclaration",
+                  "overrides": null,
                   "scope": 19,
                   "src": "184:13:0",
                   "stateVariable": false,
@@ -253,7 +260,7 @@
             "scope": 20,
             "src": "146:83:0",
             "stateMutability": "view",
-            "superFunction": null,
+            "virtual": false,
             "visibility": "public"
           }
         ],
@@ -264,7 +271,7 @@
     "src": "0:231:0"
   },
   "legacyAST": {
-    "absolutePath": "/Users/morgan/Code/crypto/smartContracts/contracts/HelloWorldContract.sol",
+    "absolutePath": "/home/alex/AltCoinTrader/crypto/smartContracts/contracts/HelloWorldContract.sol",
     "exportedSymbols": {
       "HelloWorldContract": [
         20
@@ -288,6 +295,7 @@
         "src": "0:32:0"
       },
       {
+        "abstract": false,
         "baseContracts": [],
         "contractDependencies": [],
         "contractKind": "contract",
@@ -303,8 +311,10 @@
           {
             "constant": false,
             "id": 3,
+            "mutability": "mutable",
             "name": "greeting",
             "nodeType": "VariableDeclaration",
+            "overrides": null,
             "scope": 20,
             "src": "66:15:0",
             "stateVariable": true,
@@ -392,6 +402,7 @@
             "modifiers": [],
             "name": "",
             "nodeType": "FunctionDefinition",
+            "overrides": null,
             "parameters": {
               "id": 4,
               "nodeType": "ParameterList",
@@ -407,7 +418,7 @@
             "scope": 20,
             "src": "85:56:0",
             "stateMutability": "nonpayable",
-            "superFunction": null,
+            "virtual": false,
             "visibility": "public"
           },
           {
@@ -438,12 +449,14 @@
               ]
             },
             "documentation": null,
+            "functionSelector": "cfae3217",
             "id": 19,
             "implemented": true,
             "kind": "function",
             "modifiers": [],
             "name": "greet",
             "nodeType": "FunctionDefinition",
+            "overrides": null,
             "parameters": {
               "id": 12,
               "nodeType": "ParameterList",
@@ -457,8 +470,10 @@
                 {
                   "constant": false,
                   "id": 14,
+                  "mutability": "mutable",
                   "name": "",
                   "nodeType": "VariableDeclaration",
+                  "overrides": null,
                   "scope": 19,
                   "src": "184:13:0",
                   "stateVariable": false,
@@ -486,7 +501,7 @@
             "scope": 20,
             "src": "146:83:0",
             "stateMutability": "view",
-            "superFunction": null,
+            "virtual": false,
             "visibility": "public"
           }
         ],
@@ -498,18 +513,18 @@
   },
   "compiler": {
     "name": "solc",
-    "version": "0.5.16+commit.9c3226ce.Emscripten.clang"
+    "version": "0.6.6+commit.6c089d02.Emscripten.clang"
   },
   "networks": {
-    "5777": {
+    "1602364289443": {
       "events": {},
       "links": {},
-      "address": "0xcC705e40102609D388fD04B403e08E2994d25A17",
-      "transactionHash": "0x9fe4233185bcf05b1a7ba3a05c2ed9798f5327ddcf196a84cae6cd38fcc50f6f"
+      "address": "0x76259897Bbe46adb889F7b974eFa14778c5b7459",
+      "transactionHash": "0x4325e6a0307002b1cccddbd48b303052958c7594578cc269da55fe4dd74d9569"
     }
   },
   "schemaVersion": "3.2.5",
-  "updatedAt": "2020-10-07T23:50:39.301Z",
+  "updatedAt": "2020-10-10T22:27:42.262Z",
   "networkType": "ethereum",
   "devdoc": {
     "methods": {}

@@ -13,4 +13,7 @@ contract GLDToken is ERC20 {
     function symbol() public view returns(string) {
         return 'PZI';
     }
+    function balanceOf(address _owner) public view returns(uint256 balance) {
+        return b
+    }
 }
