@@ -7,7 +7,7 @@ const { FACTORY_ADDRESS, INIT_CODE_HASH } = require('@uniswap/sdk');
 const { pack, keccak256 } = require('@ethersproject/solidity');
 const { getCreate2Address } = require('@ethersproject/address');
 
-const chainId = ChainId.RINKEBY
+const chainId = ChainId.MAINNET
 const tokenAddress = '0x6B175474E89094C44Da98b954EedeAC495271d0F' // must be checksummed
 const decimals = 18
 // const decimals =async function getDecimals(chainId: ChainId, tokenAddress: string): Promise<number> {

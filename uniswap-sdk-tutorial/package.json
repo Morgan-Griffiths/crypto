@@ -1,0 +1,21 @@
+{
+  "name": "uniswap-sdk-tutorial",
+  "version": "1.0.0",
+  "description": "",
+  "author": "Crypto Cam Tech",
+  "repository": "https://github.com/cryptocamtech/uniswap-sdk-tutorial",
+  "homepage": "https://cryptocam.tech/",
+  "dependencies": {
+    "@ethersproject/contracts": "^5.0.2",
+    "@ethersproject/providers": "^5.0.5",
+    "@ethersproject/solidity": "^5.0.2",
+    "@truffle/hdwallet-provider": "^1.0.42",
+    "@uniswap/sdk": "^3.0.3-beta.1",
+    "dotenv": "^8.2.0",
+    "ethers": "^5.0.8"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
