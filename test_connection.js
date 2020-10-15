@@ -14,6 +14,7 @@ const decimals = 18
 //     // implementation details
 //   }
 
+
 // You can use any standard network name or standard Chain ID
 //  - "homestead" or 1 (or omit; this is the default network)
 //  - "ropsten"   or 3
@@ -28,8 +29,13 @@ web3.eth.defaultAccount = process.env.WALLET_ADDRESS
 // console.log(web3.givenProvider)
 
 const main = async () => {
-
-    getPair(address tokenA, address tokenB)
+    const weth = WETH[chainId];
+    const token0 = '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' // WETH
+    const token1 = '0x32ce7e48debdccbfe0cd037cc89526e4382cb81b' // change me!
+    
+    const pair = getCreate2Address(FACTORY_ADDRESS,keccak256(['bytes'], [pack(['address', 'address'], [token1,token0])]),INIT_CODE_HASH)
+    console.log('pair',pair)
+    // getPair(address tokenA, address tokenB)
 
     // Fetcher.fetchTokenData(chainId, tokenAddress,provider=provider,"DAI", "Dai Stablecoin").then(token => {
     //     console.log(token)
