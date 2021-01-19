@@ -31,8 +31,8 @@ web3.eth.defaultAccount = process.env.WALLET_ADDRESS
 const main = async () => {
     const weth = WETH[chainId];
     const token0 = '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' // WETH
-    const token1 = '0x32ce7e48debdccbfe0cd037cc89526e4382cb81b' // change me!
-    
+    const token1 = '0x6b175474e89094c44da98b954eedeac495271d0f' // target token
+    console.log('token1',token1)
     const pair = getCreate2Address(FACTORY_ADDRESS,keccak256(['bytes'], [pack(['address', 'address'], [token1,token0])]),INIT_CODE_HASH)
     console.log('pair',pair)
     // getPair(address tokenA, address tokenB)
