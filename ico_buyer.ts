@@ -11,9 +11,6 @@ let tx;
 const checkbotcheck = cron.schedule("* * * * * *", async () => {
   const liquidityBool = await api.checkLiquidity(inputToken);
   if (liquidityBool) {
-    const highestPending = await api.getHighestPrice();
-    const memPendGasHigh = utils.fromWei(highestPending.gasPrice, "gwei");
-    const maxGasPrice = utils.toBN(maxProfit) / (utils.toBN(gasUsed) * 1000);
     buybotbuy();
   }
 });
