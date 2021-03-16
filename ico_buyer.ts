@@ -6,7 +6,6 @@ const api = new API(process.env.DEFAULT_ADDRESS, process.env.PRIVATE_KEY, 1);
 const inputToken = process.argv[process.argv.length - 2];
 const inputAmount = process.argv[process.argv.length - 1];
 const gasUsed = 125000;
-let tx;
 
 const checkbotcheck = cron.schedule("* * * * * *", async () => {
   const liquidityBool = await api.checkLiquidity(inputToken);
