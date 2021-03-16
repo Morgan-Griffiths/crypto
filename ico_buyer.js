@@ -6,6 +6,7 @@ const api = new API(process.env.DEFAULT_ADDRESS, process.env.PRIVATE_KEY, 1);
 const inputToken = process.argv[process.argv.length - 2];
 const inputAmount = process.argv[process.argv.length - 1];
 const gasUsed = 125000;
+let tx;
 
 const checkbotcheck = cron.schedule("* * * * * *", async () => {
   const liquidityBool = await api.checkLiquidity(inputToken);
@@ -21,7 +22,7 @@ async function buybotbuy() {
     const memPendGasHigh = utils.fromWei(highestPending.gasPrice, "ether");
     const predETHTxFee = memPendGasHigh * gasUsed; // Use to determine whether or not tx is worth it.
     const gasPrice = utils.fromWei(highestPending.gasPrice, "gwei");
-    await api.swapFromEth(inputToken, inputAmount, gasPrice);
+    tx = await api.swapFromEth(inputToken, inputAmount, gasPrice);
     const myCurrTxHash = await api.getMyTxHash();
     if (typeof myCurrTxHash === "error") {
         throw new Error(myCurrTxHash.message);
@@ -43,12 +44,17 @@ async function buybotbuy() {
   }
 }
 
-function sellbotsell(cron) {
-    cron.destroy();
+function sellbotsell(job) {
+    job.destroy();
+    const sellbotsell = cron.schedule("* * * * * *", async () => {
+
+    });
 }
 
-function cancelTx(cron) {
-    cron.destroy();
+async function cancelTx(job) {
+    job.destroy();
+    const newGasPrice = tx.gasPrice * 1.1;
+    await api.cancelTx(tx.txCount, newGasPrice)
 }
 
 const testTrade = async (token) => {};

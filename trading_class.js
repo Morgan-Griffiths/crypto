@@ -230,7 +230,7 @@ class API {
       };
       // fire away!
       this.sendSigned(txData, this.callback.bind(this));
-      return txCount;
+      return { txCount, gasPrice };
     });
   }
 
@@ -385,6 +385,24 @@ class API {
       };
       // fire away!
       // this.sendSigned(txData, this.callback.bind(this))
+    });
+  }
+
+  async cancelTx(txCount, gasPrice) {
+    const nonce = web3.utils.toHex(txCount);
+    web3.eth.getTransactionCount(web3.eth.defaultAccount).then((err, txCount) => {
+      if(err) return err;
+      const txData = {
+        nonce,
+        gasLimit: web3.utils.toHex("300000"),
+        gasPrice,
+        to: process.env.UNISWAP_ROUTER_ADDRESS,
+        from: web3.eth.defaultAccount,
+        data: null,
+        value: web3.utils.toHex(0),
+      };
+      this.sendSigned(txData, this.callback.bind(this));
+      return txCount;
     });
   }
 
