@@ -85,12 +85,12 @@ class API {
         )
         // console.log(web3.utils.toChecksumAddress("0xa478c2975ab1ea89e8196811f51a7b7ade33eb11"))
         // const amountIn = web3.utils.toWei("0.1", 'ether') // 10**17
-        const amountIn = `${50 * 10 ** DAI.decimals}`;
+        // const amountIn = `${50 * 10 ** DAI.decimals}`;
         // console.log(typeof amountIn,amountIn)
-        this.swapToEth(DAI,amountIn)
+        // this.swapToEth(DAI,amountIn)
         // this.swapFromEth(DAI,amountIn)
         // this.testTrade()
-        // this.checkLiquidity('DAI')
+        this.checkLiquidity('DAI')
     }
 
     async testTrade() {
@@ -231,9 +231,7 @@ class API {
                 data: approvalTx,
                 value: web3.utils.toHex(0)
             }
-            // fire away!
             this.sendSignedAsync(txData)
-                .on((err) => {console.log('approve err',err)})
                 .then(() => {
                     const tx = routerContract.methods.swapExactTokensForETH(web3.utils.toHex(amountIn),web3.utils.toHex(String(amountOutMin)),path,addressFrom,deadline)
                     const encodedABI = tx.encodeABI()
@@ -249,7 +247,6 @@ class API {
                             data: encodedABI,
                             value: web3.utils.toHex(0)
                         }
-                        // fire away!
                         this.sendSigned(txData, this.callback.bind(this))
                 })
             })

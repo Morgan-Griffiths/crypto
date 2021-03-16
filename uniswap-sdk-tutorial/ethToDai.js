@@ -27,7 +27,7 @@ var networks = require('@ethersproject/networks');
 const util = require('util');
 const { isBytesLike } = require('ethers/lib/utils');
 
-const url = process.env.URL;
+const url = process.env.INFURA_ACCESS_TOKEN;
 console.log("url: " + url);
 
 // ABI imports
@@ -104,6 +104,7 @@ const executeTrade = async (provider,account,tokenSend,tokenReceive,uniswap,trad
             gasLimit: tradeParams.gasLimit.toHexString()
         }
     );
+    console.log(tx)
 }
 
 const executeTokenTrade = async (provider,account,tokenSend,tokenReceive,uniswap,decimals,tradeParams) => {
@@ -143,21 +144,30 @@ const executeTokenTrade = async (provider,account,tokenSend,tokenReceive,uniswap
             gasLimit: tradeParams.gasLimit.toHexString()
         }
     ).catch((err) => { console.error(err); });
+    console.log(tx)
 }
 
 const init = async () => {
     console.group("Main")
     // pick who your provider
-    const provider = new ethers.providers.JsonRpcProvider(url);
+    // const network = "homestead";
+
+    // // Specify your own API keys
+    // // Each is optional, and if you omit it the default
+    // // API key for that service will be used.
+    // const provider = ethers.getDefaultProvider(network, {
+    //     infura: process.env.INFURA_PROJECT_ID,
+    // });
+    const provider = new ethers.providers.JsonRpcProvider(`https://mainnet.infura.io/v3/${process.env.INFURA_PROJECT_ID}`);
+    console.log('provider',provider)
     const signer = new ethers.Wallet(Buffer.from(process.env.PRIVATE_KEY, "hex"))
     const account = signer.connect(provider);
 
-
     const weth = WETH[chainId];
-    const uniswap_address = self.Web3.utils.toChecksumAddress('0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f') // Uni:Token input exchange ex: UniV2:DAI
-    let weth_balance = .balanceOf(uniswap_address).call()
-    weth_balance = self.Web3.fromWei(weth_balance,'ether')
-    console.log(`WETH quantity in Uniswap Pool = ${weth_balance}`)
+    // const uniswap_address = self.Web3.utils.toChecksumAddress('0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f') // Uni:Token input exchange ex: UniV2:DAI
+    // let weth_balance = .balanceOf(uniswap_address).call()
+    // weth_balance = self.Web3.fromWei(weth_balance,'ether')
+    // console.log(`WETH quantity in Uniswap Pool = ${weth_balance}`)
     // const checksum_addy = Web3.utils.toChecksumAddress(process.env.XCORE_ADDRESS)
     // const XCORE = new Token(ChainId.MAINNET, checksum_addy, 18)
 
@@ -169,13 +179,13 @@ const init = async () => {
 
     // console.log(route.midPrice.toSignificant(6)) // 201.306
     // console.log(route.midPrice.invert().toSignificant(6)) // 0.00496756
-    // const tradeParams = {
-    //     gasPrice: ethers.BigNumber.from(20_000_000_000), // in wei
-    //     gasLimit: ethers.BigNumber.from(150_000),
-    //     amountIn:"1.0", // in Ether
-    //     slippageTolerance:new Percent('2000', '10000'), // in thousands
-    // }
-    // const dai = await Fetcher.fetchTokenData(chainId, daiAddress, provider, "Dai", "Dai stablecoin");
+    const tradeParams = {
+        gasPrice: ethers.BigNumber.from(100), // in wei
+        gasLimit: ethers.BigNumber.from(58000),
+        amountIn:"1.0", // in Ether
+        slippageTolerance:new Percent('50', '10000'), // in thousands
+    }
+    const dai = await Fetcher.fetchTokenData(chainId, daiAddress, provider, "Dai", "Dai stablecoin");
     // const XCoreAddress = Web3.utils.toChecksumAddress(process.env.XCORE_ADDRESS)
     // const XCore = await Fetcher.fetchTokenData(chainId, XCoreAddress, provider, "XCORE","XCORE Token");
     // const CoreAddress = Web3.utils.toChecksumAddress(process.env.CORE_ADDRESS)
@@ -183,12 +193,12 @@ const init = async () => {
     // const weth = WETH[chainId];
 
     // Buy Dai
-    // const uniswap = new ethers.Contract(
-    //     uniswapV2ExchangeAddress,
-    //     ['function swapExactETHForTokens(uint amountOutMin, address[] calldata path, address to, uint deadline) external payable returns (uint[] memory amounts)'],
-    //     account
-    //   );
-    // await executeTrade(provider,account,weth,dai,uniswap,tradeParams) 
+    const uniswap = new ethers.Contract(
+        uniswapV2ExchangeAddress,
+        ['function swapExactETHForTokens(uint amountOutMin, address[] calldata path, address to, uint deadline) external payable returns (uint[] memory amounts)'],
+        account
+      );
+    await executeTrade(provider,account,weth,dai,uniswap,tradeParams) 
 
 
     // const daiContract = new ethers.Contract(
