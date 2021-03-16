@@ -6,8 +6,6 @@ const api = new API(process.env.DEFAULT_ADDRESS, process.env.PRIVATE_KEY, 1);
 const inputToken = process.argv[process.argv.length - 2];
 const inputAmount = process.argv[process.argv.length - 1];
 const gasUsed = 125000;
-const balance = await api.balance();
-const maxProfit = balance * 2;
 let tx;
 
 const checkbotcheck = cron.schedule("* * * * * *", async () => {
@@ -22,6 +20,8 @@ const checkbotcheck = cron.schedule("* * * * * *", async () => {
 
 async function buybotbuy() {
   try {
+    const balance = await api.balance();
+    const maxProfit = balance * 2;
     checkbotcheck.destroy();
     const highestPending = await api.getHighestPrice();
     const predETHTxFee = highestPending.gasPrice * gasUsed; // Use to determine whether or not tx is worth it.
