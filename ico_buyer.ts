@@ -30,10 +30,12 @@ async function buybotbuy() {
         timer++;
         const receipt = api.getMyReceipt(myCurrTxHash);
         if (timer >= 15 && !receipt) {
-          cancelTx(seebotsee, tx);
+          killJob(seebotsee);
+          cancelTx(tx);
         }
         if (timer < 15 && receipt.status) {
-          sellbotsell(seebotsee);
+          killJob(seebotsee);
+          sellbotsell();
         }
       });
     }
@@ -42,8 +44,7 @@ async function buybotbuy() {
   }
 }
 
-async function sellbotsell(job) {
-  job.destroy();
+async function sellbotsell() {
   let sales = 0;
   let tx;
   const sellbotsell = cron.schedule("* * * * *", async () => {
@@ -58,18 +59,17 @@ async function sellbotsell(job) {
         tx = await api.swapToEth(inputToken, balance);
       }
     } else {
-      stopBot(sellbotsell);
+      killJob(sellbotsell);
     }
     sales++;
   });
 }
 
-async function cancelTx(job, { txCount, gasPrice }) {
-  job.destroy();
+async function cancelTx({ txCount, gasPrice }) {
   const newGasPrice = gasPrice * 1.1;
   await api.cancelTx(txCount, newGasPrice);
 }
 
-function stopBot(job) {
-  job.destroy();
+function killJob(job) {
+  job.destroy()
 }
