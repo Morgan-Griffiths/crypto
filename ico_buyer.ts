@@ -15,8 +15,8 @@ const api = new API(
   process.env.PRIVATE_KEY,
   CHAINID
 );
-const tokenName = "DAI";
-const inputAmount = 1;
+const tokenName = process.argv[process.argv.length - 2];
+const inputAmount = process.argv[process.argv.length - 1];
 const gasUsed = 125000;
 console.log(inputAmount);
 
