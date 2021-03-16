@@ -47,7 +47,7 @@ async function buybotbuy() {
 function sellbotsell(job) {
     job.destroy();
     const sellbotsell = cron.schedule("* * * * * *", async () => {
-
+        
     });
 }
 
