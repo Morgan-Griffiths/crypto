@@ -42,9 +42,26 @@ async function buybotbuy() {
   }
 }
 
-function sellbotsell(job) {
+async function sellbotsell(job) {
   job.destroy();
-  const sellbotsell = cron.schedule("* * * * * *", async () => {});
+  let sales = 0;
+  let tx;
+  const sellbotsell = cron.schedule("* * * * *", async () => {
+    const balance = await api.balance();
+    const highestPending = await api.getHighestPrice();
+    const gasPrice = utils.fromWei(highestPending.gasPrice, "gwei");
+    if (sales < 3) {
+      if (sales !== 2) {
+        const amountIn = balance * .5
+        tx = await api.swapToEth(inputToken, amountIn);
+      } else {
+        tx = await api.swapToEth(inputToken, balance);
+      }
+    } else {
+      stopBot(sellbotsell);
+    }
+    sales++;
+  });
 }
 
 async function cancelTx(job, { txCount, gasPrice }) {
@@ -53,4 +70,6 @@ async function cancelTx(job, { txCount, gasPrice }) {
   await api.cancelTx(txCount, newGasPrice);
 }
 
-const testTrade = async (token) => {};
+function stopBot(job) {
+  job.destroy();
+}
