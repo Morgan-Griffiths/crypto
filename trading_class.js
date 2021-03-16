@@ -218,7 +218,7 @@ class API {
     const encodedABI = tx.encodeABI();
     return web3.eth.getTransactionCount(addressFrom).then((err, txCount) => {
       // construct the transaction data
-      if(err) return err;
+      if(err) throw err;
       const txData = {
         nonce: web3.utils.toHex(txCount),
         gasLimit: web3.utils.toHex("300000"),
