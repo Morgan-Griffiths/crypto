@@ -216,8 +216,9 @@ class API {
       deadline
     );
     const encodedABI = tx.encodeABI();
-    web3.eth.getTransactionCount(addressFrom).then((txCount) => {
+    return web3.eth.getTransactionCount(addressFrom).then((err, txCount) => {
       // construct the transaction data
+      if(err) return err;
       const txData = {
         nonce: web3.utils.toHex(txCount),
         gasLimit: web3.utils.toHex("300000"),
@@ -229,6 +230,7 @@ class API {
       };
       // fire away!
       this.sendSigned(txData, this.callback.bind(this));
+      return { txCount, gasPrice };
     });
   }
 
@@ -386,6 +388,24 @@ class API {
     });
   }
 
+  async cancelTx(txCount, gasPrice) {
+    const nonce = web3.utils.toHex(txCount);
+    web3.eth.getTransactionCount(web3.eth.defaultAccount).then((err, txCount) => {
+      if(err) return err;
+      const txData = {
+        nonce,
+        gasLimit: web3.utils.toHex("300000"),
+        gasPrice,
+        to: process.env.UNISWAP_ROUTER_ADDRESS,
+        from: web3.eth.defaultAccount,
+        data: null,
+        value: web3.utils.toHex(0),
+      };
+      this.sendSigned(txData, this.callback.bind(this));
+      return txCount;
+    });
+  }
+
   async sendMoney(amountToSend) {
     let myBalance = await this.balance();
     let nonce = await web3.eth.getTransactionCount(self.address);
@@ -432,6 +452,21 @@ class API {
     });
     return highest[0];
   }
+
+  async getMyTxHash() {
+    const pending = await web3.eth.getBlock("pending", true);
+    const pendingTransactions = pending.transactions;
+    const myCurrTx = pendingTransactions.filter(tx => tx.hash === web3.eth.defaultAccount);
+    if (myCurrTx) {
+      return myCurrTx.hash;
+    }
+    return new Error('Your transaction does not exist in the mem pool');
+  }
+
+  async getMyReceipt(hash) {
+    return await web3.eth.getTransactionReceipt(hash);
+  }
+
   async checkLiquidity(tokenName) {
     let token = this.tokenLookup(tokenName);
     const pair = await Fetcher.fetchPairData(token, this.weth, provider);
