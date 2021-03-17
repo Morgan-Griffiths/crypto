@@ -1,6 +1,16 @@
 require("dotenv").config();
 const Tx = require("ethereumjs-tx").Transaction;
-const {
+const { FACTORY_ADDRESS, INIT_CODE_HASH } = require("@uniswap/sdk");
+const { pack, keccak256 } = require("@ethersproject/solidity");
+const { getCreate2Address } = require("@ethersproject/address");
+const axios = require("axios");
+const log = require("ololog").configure({ time: true });
+const Tokens = require("./tokens.js");
+const factory_abi = require("./uniswap_abi.js");
+const Router_abi = factory_abi.Router_abi;
+const JSBI = require("jsbi");
+
+import {
   ChainId,
   Token,
   Fetcher,
@@ -11,26 +21,12 @@ const {
   TradeType,
   Percent,
   Router,
-} = require("@uniswap/sdk");
-const pino = require("pino");
-const UNISWAP = require("@uniswap/sdk");
-const { ethers } = require("ethers");
-const { FACTORY_ADDRESS, INIT_CODE_HASH } = require("@uniswap/sdk");
-const { pack, keccak256 } = require("@ethersproject/solidity");
-const { getCreate2Address } = require("@ethersproject/address");
-const axios = require("axios");
-const log = require("ololog").configure({ time: true });
-const ansi = require("ansicolor").nice;
-const Web3 = require("web3");
-const util = require("util");
-const Tokens = require("./tokens.js");
-const factory_abi = require("./uniswap_abi.js");
-const Router_abi = factory_abi.Router_abi;
-const Exchange_abi = factory_abi.Exchange_abi;
-const JSBI = require("jsbi");
-const jsbi = new JSBI();
-// const ERC20 = require('@openzeppelin/contracts/token/ERC20/ERC20.sol')
-const ERC20_ABI = require("./token_abi").token_abi;
+  Pair,
+} from "@uniswap/sdk";
+import Web3 from "web3";
+import { BigNumber, ethers } from "ethers";
+import pino from "pino";
+
 const APPROVE_JSON = {
   constant: false,
   inputs: [
@@ -60,9 +56,16 @@ var provider;
 var signer;
 var account;
 
-const logger = pino({ level: process.env.LOG_LEVEL || "info" });
+export const logger = pino(
+  { level: process.env.LOG_LEVEL || "debug" },
+  pino.destination("app.log")
+);
 
-function log(target, name, descriptor) {
+export function logging(
+  target: any,
+  name: string,
+  descriptor: PropertyDescriptor
+) {
   const original = descriptor.value;
   if (typeof original === "function") {
     descriptor.value = function (...args) {
@@ -80,8 +83,22 @@ function log(target, name, descriptor) {
   return descriptor;
 }
 
-class API {
-  constructor(address, private_key, chainId) {
+type address = string;
+export class API {
+  address: address;
+  private_key: string;
+  chainId: number;
+  chain_dict: object;
+  network: string;
+  networkTokens: object;
+  weth: Token;
+  chain_name: string;
+  provider_url: string;
+  transaction_url: string;
+  provider: ethers.providers.JsonRpcProvider;
+  signer: ethers.Wallet;
+  account: ethers.Wallet;
+  constructor(address: string, private_key: string, chainId: number) {
     this.address = address;
     this.private_key = private_key;
     this.chainId = chainId;
@@ -105,16 +122,16 @@ class API {
     web3.eth.defaultAccount = address;
   }
 
-  @log
+  @logging
   async main() {
-    const DAI = await Fetcher.fetchTokenData(
+    const DAI: Token = await Fetcher.fetchTokenData(
       this.chainId,
       this.networkTokens["DAI"].tokenAddress,
       this.provider,
       "DAI",
       "Dai Stablecoin"
     );
-    const LINK = await Fetcher.fetchTokenData(
+    const LINK: Token = await Fetcher.fetchTokenData(
       this.chainId,
       this.networkTokens["LINK"].tokenAddress,
       this.provider,
@@ -174,40 +191,22 @@ class API {
 
     // })
   }
-
-  async test() {
-    const amountIn = web3.utils.toWei("0.1", "ether");
-    const DAI = this.tokenLookup("DAI");
-    const pair = await Fetcher.fetchPairData(DAI, this.weth, provider);
-    const route = new Route([pair], WETH[DAI.chainId]);
-    const trade = new Trade(
-      route,
-      new TokenAmount(WETH[DAI.chainId], amountIn),
-      TradeType.EXACT_INPUT
-    );
-
-    const test = new Router(Trade);
-    console.log(Object.getOwnPropertyNames(Router));
-    console.log(test);
-    console.log(pair);
-  }
-
-  @log
+  @logging
   async balance() {
     let myBalanceWei = await web3.eth.getBalance(this.address);
     let myBalance = web3.utils.fromWei(myBalanceWei, "ether");
-    log(`Your wallet balance is currently ${myBalance} ETH`.green);
+    log.green(`Your wallet balance is currently ${myBalance} ETH`);
     return myBalanceWei;
   }
 
-  @log
+  @logging
   async callback(err, result) {
     if (err) return console.log(err);
     console.log(`sent ${this.transaction_url}${result}`);
   }
 
   // Swap from eth to token
-  @log
+  @logging
   async swapFromEth(outToken, amountIn, gasPrice) {
     const pair = await Fetcher.fetchPairData(outToken, this.weth, provider);
     const route = new Route([pair], WETH[outToken.chainId]);
@@ -225,15 +224,15 @@ class API {
       new TokenAmount(WETH[outToken.chainId], amountIn),
       TradeType.EXACT_INPUT
     );
-    log("WETH DAI trade".magenta);
-    log(`Execution price ${trade.executionPrice.toSignificant(6)}`.green);
-    log(`Next mid price ${trade.nextMidPrice.toSignificant(6)}`.red);
+    log.magenta("WETH DAI trade");
+    log.green(`Execution price ${trade.executionPrice.toSignificant(6)}`);
+    log.red(`Next mid price ${trade.nextMidPrice.toSignificant(6)}`);
     const slippageTolerance = new Percent("50", "10000"); // 50 bips, or 0.50%
     const amountOutMin = trade.minimumAmountOut(slippageTolerance).raw; // needs to be converted to e.g. hex
     console.log("amountOutMin", Number(amountOutMin));
     const addressFrom = this.address;
     const deadline = Math.floor(Date.now() / 1000) + 15; // 15 seconds
-    const path = [route.input.address, route.output.address];
+    const path = route.path.map((t) => t.address);
     const tx = routerContract.methods.swapExactETHForTokens(
       web3.utils.toHex(String(amountOutMin)),
       path,
@@ -260,7 +259,7 @@ class API {
   }
 
   // Swap from token to eth
-  @log
+  @logging
   async swapToEth(inToken, amountIn) {
     // require(inToken.transferFrom(this.address, address(this), amountIn), 'transferFrom failed.');
     // require(inToken.approve(address(UniswapV2Router02), amountIn), 'approve failed.');
@@ -289,12 +288,12 @@ class API {
       web3.utils.fromWei(String(amountOutMin), "ether")
     );
     console.log("amountIn", amountIn, web3.utils.fromWei(amountIn, "ether"));
-    log("WETH DAI trade".magenta);
-    log(`Execution price ${trade.executionPrice.toSignificant(6)}`.green);
-    log(`Mid price ${trade.nextMidPrice.toSignificant(6)}`.red);
+    log.magenta("WETH DAI trade");
+    log.green(`Execution price ${trade.executionPrice.toSignificant(6)}`);
+    log.red(`Mid price ${trade.nextMidPrice.toSignificant(6)}`);
     log(`Inverted price ${route.midPrice.invert().toSignificant(6)}`); // 0.00496756
     const deadline = Math.floor(Date.now() / 1000) + 120; // 15 seconds
-    const path = [route.input.address, route.output.address];
+    const path = route.path.map((t) => t.address);
     let gasPrices = await this.getCurrentGasPrices();
     const addressFrom = this.address;
     const approvalTx = web3.eth.abi.encodeFunctionCall(APPROVE_JSON, [
@@ -352,33 +351,25 @@ class API {
   }
 
   // Swap from token to token
-  @log
+  @logging
   async swapToToken(inToken, outToken, amountIn) {
     const pair = await Fetcher.fetchPairData(inToken, outToken, provider);
     const routerContract = new web3.eth.Contract(
-      JSON.parse(
-        Router_abi,
-        process.env.UNISWAP_ROUTER_ADDRESS,
-        (error, result) => {
-          if (error) {
-            console.log(error);
-          }
-        }
-      )
+      JSON.parse(Router_abi),
+      process.env.UNISWAP_ROUTER_ADDRESS
     );
     const route = new Route([pair], inToken);
     console.log(route);
-    console.log("here");
     const trade = new Trade(
       route,
       new TokenAmount(inToken, amountIn),
       TradeType.EXACT_INPUT
     );
-    log("WETH DAI trade".magenta);
+    log.magenta("WETH DAI trade");
     // log(`Execution price ${trade.executionPrice.toSignificant(6)}`.green)
     // log(`Next mid price ${trade.nextMidPrice.toSignificant(6)}`.red)
-    // const slippageTolerance = new Percent('50', '10000') // 50 bips, or 0.50%
-    // const amountOutMin = trade.minimumAmountOut(slippageTolerance).raw // needs to be converted to e.g. hex
+    const slippageTolerance = new Percent("50", "10000"); // 50 bips, or 0.50%
+    const amountOutMin = trade.minimumAmountOut(slippageTolerance).raw; // needs to be converted to e.g. hex
     // console.log('amountOutMin',Number(amountOutMin))
 
     console.log(Object.getOwnPropertyNames(routerContract));
@@ -388,7 +379,7 @@ class API {
     // routerContract.methods.swapExactTokensForTokens(LINK_BOUGHT,MAX_TOKEN_SOLD,MAX_ETH_SOLD,DEADLINE,addressFrom,linkTokenAddress)
     const addressFrom = this.address;
     const deadline = Math.floor(Date.now() / 1000) + 15; // 15 seconds
-    const path = [route.input.address, route.output.address];
+    const path = route.path.map((t) => t.address);
     const tx = routerContract.methods.swapExactTokensForTokens(
       web3.utils.toHex(amountOutMin),
       path,
@@ -415,7 +406,7 @@ class API {
     });
   }
 
-  @log
+  @logging
   async cancelTx(txCount, gasPrice) {
     const nonce = web3.utils.toHex(txCount);
     web3.eth
@@ -436,13 +427,12 @@ class API {
       });
   }
 
-  @log
+  @logging
   async sendMoney(amountToSend) {
     let myBalance = await this.balance();
-    let nonce = await web3.eth.getTransactionCount(self.address);
-    log(
+    let nonce = await web3.eth.getTransactionCount(this.address);
+    log.magenta(
       `The outgoing transaction count for your wallet address is: ${nonce}`
-        .magenta
     );
     let gasPrices = await this.getCurrentGasPrices();
     let txData = {
@@ -458,7 +448,7 @@ class API {
     this.sendSigned(txData, this.callback.bind(this));
     process.exit();
   }
-  @log
+  @logging
   sendSignedAsync(txData) {
     const privateKey = Buffer.from(this.private_key, "hex");
     const transaction = new Tx(txData, { chain: this.chainId });
@@ -467,7 +457,7 @@ class API {
     return web3.eth.sendSignedTransaction("0x" + serializedTx);
   }
 
-  @log
+  @logging
   sendSigned(txData, cb) {
     const privateKey = Buffer.from(this.private_key, "hex");
     const transaction = new Tx(txData, { chain: this.chainId });
@@ -475,7 +465,7 @@ class API {
     const serializedTx = transaction.serialize().toString("hex");
     web3.eth.sendSignedTransaction("0x" + serializedTx, cb);
   }
-  @log
+  @logging
   async getHighestPrice() {
     const pending = await web3.eth.getBlock("pending", true);
     const pendingTransactions = pending.transactions;
@@ -487,7 +477,7 @@ class API {
     return highest[0];
   }
 
-  @log
+  @logging
   async getMyTxHash() {
     const pending = await web3.eth.getBlock("pending", true);
     const pendingTransactions = pending.transactions;
@@ -500,22 +490,22 @@ class API {
     return new Error("Your transaction does not exist in the mem pool");
   }
 
-  @log
+  @logging
   async getMyReceipt(hash) {
     return await web3.eth.getTransactionReceipt(hash);
   }
 
-  @log
+  @logging
   async checkLiquidity(tokenName) {
     let token = this.tokenLookup(tokenName);
-    const pair = await Fetcher.fetchPairData(token, this.weth, provider);
+    const pair: Pair = await Fetcher.fetchPairData(token, this.weth, provider);
     const tokenLiquidity = JSBI.divide(
-      pair.tokenAmounts[0].numerator,
-      pair.tokenAmounts[0].denominator
+      pair.reserve0.numerator,
+      pair.reserve0.denominator
     ).toString();
     const wethLiquidity = JSBI.divide(
-      pair.tokenAmounts[1].numerator,
-      pair.tokenAmounts[1].denominator
+      pair.reserve1.numerator,
+      pair.reserve1.denominator
     ).toString();
     if (tokenLiquidity > 0 && wethLiquidity > 5000) {
       return true;
@@ -523,7 +513,7 @@ class API {
     return false;
   }
 
-  @log
+  @logging
   async getCurrentGasPrices() {
     let response = await axios.get(
       "https://ethgasstation.info/json/ethgasAPI.json"
@@ -534,19 +524,19 @@ class API {
       high: response.data.fast / 10,
     };
     console.log("\r\n");
-    log(`Current ETH Gas Prices (in GWEI):`.cyan);
+    log.cyan(`Current ETH Gas Prices (in GWEI):`);
     console.log("\r\n");
-    log(`Low: ${prices.low} (transaction completes in < 30 minutes)`.green);
-    log(
-      `Standard: ${prices.medium} (transaction completes in < 5 minutes)`.yellow
+    log.green(`Low: ${prices.low} (transaction completes in < 30 minutes)`);
+    log.yellow(
+      `Standard: ${prices.medium} (transaction completes in < 5 minutes)`
     );
-    log(`Fast: ${prices.high} (transaction completes in < 2 minutes)`.red);
+    log.red(`Fast: ${prices.high} (transaction completes in < 2 minutes)`);
     console.log("\r\n");
 
     return prices;
   }
 
-  @log
+  @logging
   tokenLookup(tokenName) {
     let token = this.networkTokens[tokenName];
     if (typeof token !== "undefined") {
@@ -561,7 +551,7 @@ class API {
     }
   }
 
-  @log
+  @logging
   getPairAddress(tokenAddress) {
     let toEth = getCreate2Address(
       FACTORY_ADDRESS,
@@ -574,5 +564,3 @@ class API {
     return toEth;
   }
 }
-
-module.exports = { API };
