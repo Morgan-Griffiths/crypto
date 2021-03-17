@@ -1,4 +1,5 @@
 # crypto
+
 crypto dev env
 
 # Requirements
@@ -7,34 +8,43 @@ crypto dev env
 - geth
 - bitcoin (pip install bitcoin)
 
+## Typescript watch compile
+
+npx tsc -w -p ./
+
+## Pino logging
+
+cat app.log | npx pino-pretty -c -l
+
+tail -f app.log | npx pino-pretty -c -l
+
 ## truffle
 
-```cd smartContracts```
-```truffle compile```
+`cd smartContracts`
+`truffle compile`
 
 ### Create smart contract
 
-```truffle create contract ...```
+`truffle create contract ...`
 
 ### Create migration
 
-```truffle create migration ...```
+`truffle create migration ...`
 
 ### Testing contracts
 
-```truffle develop```
-```HelloWorldContract.deployed().then(_app => { hello = _app })```
-```hello.greet()```
+`truffle develop`
+`HelloWorldContract.deployed().then(_app => { hello = _app })`
+`hello.greet()`
 
 ## Geth
 
-```brew tap ethereum/ethereum```
-```brew install ethereum```
+`brew tap ethereum/ethereum`
+`brew install ethereum`
 
 https://medium.com/blockchain-developer/setting-up-a-pro-dev-env-for-ethereum-part-v-geth-private-blockchain-211eaccf8949
 
 ## Eth Genesis block
 
-```python mk_genesis_block.py --extradata hash_for_#1028201_goes_here > genesis_block.json```
-```./build/bin/geth --genesis genesis_block.json```
-
+`python mk_genesis_block.py --extradata hash_for_#1028201_goes_here > genesis_block.json`
+`./build/bin/geth --genesis genesis_block.json`
