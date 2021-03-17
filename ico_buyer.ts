@@ -6,7 +6,6 @@ const api = new API(process.env.DEFAULT_ADDRESS, process.env.PRIVATE_KEY, 1);
 const inputToken = process.argv[process.argv.length - 2];
 const inputAmount = process.argv[process.argv.length - 1];
 const gasUsed = 125000;
-let tx;
 
 const checkbotcheck = cron.schedule("* * * * * *", async () => {
   const liquidityBool = await api.checkLiquidity(inputToken);
@@ -34,10 +33,12 @@ async function buybotbuy() {
         timer++;
         const receipt = api.getMyReceipt(myCurrTxHash);
         if (timer >= 15 && !receipt) {
-          cancelTx(seebotsee);
+          killJob(seebotsee);
+          cancelTx(tx);
         }
         if (timer < 15 && receipt.status) {
-          sellbotsell(seebotsee);
+          killJob(seebotsee);
+          sellbotsell();
         }
       });
     }
@@ -47,15 +48,32 @@ async function buybotbuy() {
   }
 }
 
-function sellbotsell(job) {
-  job.destroy();
-  const sellbotsell = cron.schedule("* * * * * *", async () => {});
+async function sellbotsell() {
+  let sales = 0;
+  let tx;
+  const sellbotsell = cron.schedule("* * * * *", async () => {
+    const balance = await api.balance();
+    const highestPending = await api.getHighestPrice();
+    const gasPrice = utils.fromWei(highestPending.gasPrice, "gwei");
+    if (sales < 3) {
+      if (sales !== 2) {
+        const amountIn = balance * 0.5;
+        tx = await api.swapToEth(inputToken, amountIn);
+      } else {
+        tx = await api.swapToEth(inputToken, balance);
+      }
+    } else {
+      killJob(sellbotsell);
+    }
+    sales++;
+  });
 }
 
-async function cancelTx(job, { txCount, gasPrice }) {
-  job.destroy();
+async function cancelTx({ txCount, gasPrice }) {
   const newGasPrice = gasPrice * 1.1;
   await api.cancelTx(txCount, newGasPrice);
 }
 
-const testTrade = async (token) => {};
+function killJob(job) {
+  job.destroy();
+}
