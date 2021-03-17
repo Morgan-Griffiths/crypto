@@ -1,6 +1,15 @@
 {
     "compilerOptions": {
-        "target": "es5",
-        "experimentalDecorators": true
+        "module": "commonjs",
+        "esModuleInterop": true,
+        "target": "es2019",
+        // "noImplicitAny": true,
+        "moduleResolution": "node",
+        "sourceMap": true,
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "rootDir": "./",
+        "outDir": "./dist",
+        "allowJs": true
     }
 }
