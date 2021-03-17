@@ -1,6 +1,6 @@
 require("dotenv").config();
 const Tokens = require("./tokens.js");
-const { API } = require("./trading_class.js");
+const { API, logger } = require("./trading_class.js");
 
 const address = process.env.TEST_WALLET_ADDRESS;
 const private_key = process.env.TEST_PRIVATE_KEY;
