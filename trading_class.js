@@ -12,6 +12,7 @@ const {
   Percent,
   Router,
 } = require("@uniswap/sdk");
+const pino = require("pino");
 const UNISWAP = require("@uniswap/sdk");
 const { ethers } = require("ethers");
 const { FACTORY_ADDRESS, INIT_CODE_HASH } = require("@uniswap/sdk");
@@ -59,6 +60,26 @@ var provider;
 var signer;
 var account;
 
+const logger = pino({ level: process.env.LOG_LEVEL || "info" });
+
+function log(target, name, descriptor) {
+  const original = descriptor.value;
+  if (typeof original === "function") {
+    descriptor.value = function (...args) {
+      logger.info(`Arguments: ${args}`);
+      try {
+        const result = original.apply(this, args);
+        logger.info(`Result: ${result}`);
+        return result;
+      } catch (e) {
+        logger.info(`Error: ${e}`);
+        throw e;
+      }
+    };
+  }
+  return descriptor;
+}
+
 class API {
   constructor(address, private_key, chainId) {
     this.address = address;
@@ -84,6 +105,7 @@ class API {
     web3.eth.defaultAccount = address;
   }
 
+  @log
   async main() {
     const DAI = await Fetcher.fetchTokenData(
       this.chainId,
@@ -170,6 +192,7 @@ class API {
     console.log(pair);
   }
 
+  @log
   async balance() {
     let myBalanceWei = await web3.eth.getBalance(this.address);
     let myBalance = web3.utils.fromWei(myBalanceWei, "ether");
@@ -177,12 +200,14 @@ class API {
     return myBalanceWei;
   }
 
+  @log
   async callback(err, result) {
     if (err) return console.log(err);
     console.log(`sent ${this.transaction_url}${result}`);
   }
 
   // Swap from eth to token
+  @log
   async swapFromEth(outToken, amountIn, gasPrice) {
     const pair = await Fetcher.fetchPairData(outToken, this.weth, provider);
     const route = new Route([pair], WETH[outToken.chainId]);
@@ -218,7 +243,7 @@ class API {
     const encodedABI = tx.encodeABI();
     return web3.eth.getTransactionCount(addressFrom).then((err, txCount) => {
       // construct the transaction data
-      if(err) throw err;
+      if (err) throw err;
       const txData = {
         nonce: web3.utils.toHex(txCount),
         gasLimit: web3.utils.toHex("300000"),
@@ -235,6 +260,7 @@ class API {
   }
 
   // Swap from token to eth
+  @log
   async swapToEth(inToken, amountIn) {
     // require(inToken.transferFrom(this.address, address(this), amountIn), 'transferFrom failed.');
     // require(inToken.approve(address(UniswapV2Router02), amountIn), 'approve failed.');
@@ -326,6 +352,7 @@ class API {
   }
 
   // Swap from token to token
+  @log
   async swapToToken(inToken, outToken, amountIn) {
     const pair = await Fetcher.fetchPairData(inToken, outToken, provider);
     const routerContract = new web3.eth.Contract(
@@ -388,24 +415,28 @@ class API {
     });
   }
 
+  @log
   async cancelTx(txCount, gasPrice) {
     const nonce = web3.utils.toHex(txCount);
-    web3.eth.getTransactionCount(web3.eth.defaultAccount).then((err, txCount) => {
-      if(err) return err;
-      const txData = {
-        nonce,
-        gasLimit: web3.utils.toHex("300000"),
-        gasPrice,
-        to: process.env.UNISWAP_ROUTER_ADDRESS,
-        from: web3.eth.defaultAccount,
-        data: null,
-        value: web3.utils.toHex(0),
-      };
-      this.sendSigned(txData, this.callback.bind(this));
-      return txCount;
-    });
+    web3.eth
+      .getTransactionCount(web3.eth.defaultAccount)
+      .then((err, txCount) => {
+        if (err) return err;
+        const txData = {
+          nonce,
+          gasLimit: web3.utils.toHex("300000"),
+          gasPrice,
+          to: process.env.UNISWAP_ROUTER_ADDRESS,
+          from: web3.eth.defaultAccount,
+          data: null,
+          value: web3.utils.toHex(0),
+        };
+        this.sendSigned(txData, this.callback.bind(this));
+        return txCount;
+      });
   }
 
+  @log
   async sendMoney(amountToSend) {
     let myBalance = await this.balance();
     let nonce = await web3.eth.getTransactionCount(self.address);
@@ -427,6 +458,7 @@ class API {
     this.sendSigned(txData, this.callback.bind(this));
     process.exit();
   }
+  @log
   sendSignedAsync(txData) {
     const privateKey = Buffer.from(this.private_key, "hex");
     const transaction = new Tx(txData, { chain: this.chainId });
@@ -435,6 +467,7 @@ class API {
     return web3.eth.sendSignedTransaction("0x" + serializedTx);
   }
 
+  @log
   sendSigned(txData, cb) {
     const privateKey = Buffer.from(this.private_key, "hex");
     const transaction = new Tx(txData, { chain: this.chainId });
@@ -442,6 +475,7 @@ class API {
     const serializedTx = transaction.serialize().toString("hex");
     web3.eth.sendSignedTransaction("0x" + serializedTx, cb);
   }
+  @log
   async getHighestPrice() {
     const pending = await web3.eth.getBlock("pending", true);
     const pendingTransactions = pending.transactions;
@@ -453,20 +487,25 @@ class API {
     return highest[0];
   }
 
+  @log
   async getMyTxHash() {
     const pending = await web3.eth.getBlock("pending", true);
     const pendingTransactions = pending.transactions;
-    const myCurrTx = pendingTransactions.filter(tx => tx.hash === web3.eth.defaultAccount);
+    const myCurrTx = pendingTransactions.filter(
+      (tx) => tx.hash === web3.eth.defaultAccount
+    );
     if (myCurrTx) {
       return myCurrTx.hash;
     }
-    return new Error('Your transaction does not exist in the mem pool');
+    return new Error("Your transaction does not exist in the mem pool");
   }
 
+  @log
   async getMyReceipt(hash) {
     return await web3.eth.getTransactionReceipt(hash);
   }
 
+  @log
   async checkLiquidity(tokenName) {
     let token = this.tokenLookup(tokenName);
     const pair = await Fetcher.fetchPairData(token, this.weth, provider);
@@ -484,6 +523,7 @@ class API {
     return false;
   }
 
+  @log
   async getCurrentGasPrices() {
     let response = await axios.get(
       "https://ethgasstation.info/json/ethgasAPI.json"
@@ -506,6 +546,7 @@ class API {
     return prices;
   }
 
+  @log
   tokenLookup(tokenName) {
     let token = this.networkTokens[tokenName];
     if (typeof token !== "undefined") {
@@ -520,6 +561,7 @@ class API {
     }
   }
 
+  @log
   getPairAddress(tokenAddress) {
     let toEth = getCreate2Address(
       FACTORY_ADDRESS,

@@ -24,14 +24,17 @@ async function buybotbuy() {
     const predETHTxFee = highestPending.gasPrice * gasUsed; // Use to determine whether or not tx is worth it.
     if (predETHTxFee < maxProfit) {
       const gasPrice = utils.fromWei(highestPending.gasPrice, "gwei");
-      const tx = await api.swapFromEth(inputToken, inputAmount, gasPrice);
+      tx = await api.swapFromEth(inputToken, inputAmount, gasPrice);
       const myCurrTxHash = await api.getMyTxHash();
+      if (typeof myCurrTxHash === "error") {
+        throw new Error(myCurrTxHash.message);
+      }
       let timer = 0;
       const seebotsee = cron.schedule("* * * * * *", async () => {
         timer++;
         const receipt = api.getMyReceipt(myCurrTxHash);
         if (timer >= 15 && !receipt) {
-          cancelTx(seebotsee, tx);
+          cancelTx(seebotsee);
         }
         if (timer < 15 && receipt.status) {
           sellbotsell(seebotsee);
@@ -40,6 +43,7 @@ async function buybotbuy() {
     }
   } catch (e) {
     console.log(e.message);
+    seebotsee.destroy();
   }
 }
 
